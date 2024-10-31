@@ -7,7 +7,7 @@ library(lubridate)
 
 # Downloading Kindwork constraint data
 # Set your Census API key
-census_api_key("da537a3657a9c630b4efcd196c0dd4672be2bc5b")
+census_api_key(Sys.getenv("CENSUS_API_KEY"))
 
 # Define the variables to download from the B15003 table
 B24080_vars <- c(

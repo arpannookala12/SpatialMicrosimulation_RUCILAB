@@ -7,7 +7,7 @@ library(lubridate)
 
 # Downloading Income constraint data
 # Set your Census API key
-census_api_key("da537a3657a9c630b4efcd196c0dd4672be2bc5b")
+census_api_key(Sys.getenv("CENSUS_API_KEY"))
 # Define the variables to download from the B19037 table
 # B19037_001E represents total households, followed by specific income brackets across all age groups
 b19037_vars <- paste0("B19037_", sprintf("%03dE", 1:69))

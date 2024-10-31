@@ -7,7 +7,7 @@ library(lubridate)
 
 # Downloading Education constraint data
 # Set your Census API key
-census_api_key("da537a3657a9c630b4efcd196c0dd4672be2bc5b")
+census_api_key(Sys.getenv("CENSUS_API_KEY"))
 
 # Define the variables to download from the B15003 table
 B15003_vars <- c(
@@ -23,8 +23,8 @@ acs_B15003_data <- get_acs(
   survey = "acs5"
 )
 # Haldane-Anscombe Correction factor applied to each cell
-acs_B15003_data <- acs_B15003_data %>%
-  mutate(estimate = estimate + 0.5)
+# acs_B15003_data <- acs_B15003_data %>%
+#   mutate(estimate = estimate + 0.5)
 acs_B15003_data
 # Save the data to a CSV file (optional)
 # write.csv(acs_B15003_data, "acs_B15003_data_Phase4.1(May28-Jun24)2024.csv")
@@ -70,6 +70,7 @@ aggregate_edu_data <- function(data, groups) {
 # Apply the aggregation function
 aggregated_edu_data <- aggregate_edu_data(acs_B15003_data, edu_groups)
 
+
 # Display the aggregated data
 print(aggregated_edu_data)
 
@@ -81,8 +82,16 @@ pivoted_data_edu <- data_edu %>%
   select(-moe) %>% # Remove the `moe` column
   pivot_wider(names_from = variable, values_from = estimate)
 pivoted_data_edu
+row_sums <- rowSums(pivoted_data_edu[,-c(1,2)])
+# row_sums
+# Find row numbers where row sums are 0
+zero_row_indices <- which(row_sums == 0)
+print(zero_row_indices)
+con_edu <- pivoted_data_edu[-zero_row_indices,-c(1,2)]
 # write.csv(pivoted_data_edu,"pivoted_data_edu_Phase4.1(May28-Jun24)2024.csv",row.names = FALSE)
-con_edu <- pivoted_data_edu[-c(140,143,144,233,482,490,524,558,561,574),-c(1,2)]
+# con_edu <- pivoted_data_edu[-c(140,143,144,233,482,490,524,558,561,574),-c(1,2)]
 # con_edu <- pivoted_data_edu[-c(194,988,994,1070,1096,1175,1238,1285,1287,1288,1291,1292,1339,1373,1380,1502,1597,1599,1616,1627, 1636,1639,1647,1648,1658,1779,1882,1931,1934,2554,2573,2574,2576,2588,2628,2632,2641,2685,2765,2766,2874,3234,3345,3346,3352,3353,3396,3538,3551,3552,3555,3730,3733,3734,3823,4072,4080,4114,4148,4151,4164,4331,4640,5160,5168,5217,5238,5280, 5284,5289,5319,5336,5362,5363,5364,5789),-c(1,2)]
 con_edu
+con_edu <- con_edu + 0.5
+print(con_edu)
 write.csv(con_edu,"con_edu.csv",row.names = FALSE)

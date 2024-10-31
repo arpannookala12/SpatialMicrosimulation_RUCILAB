@@ -65,18 +65,7 @@ process_acs_age_sex_data <- function(brks, labs, statename, countyname) {
   missing_labs <- setdiff(names(mapping_age_lab), labs)
   extra_indices <- as.numeric(unlist(mapping_age_lab[missing_labs]))
 
-  for(i in 1:nrow(acs_b01001_data)) {
-    if (acs_b01001_data[i, 'variable'] == 'B01001_002' || acs_b01001_data[i, 'variable'] == 'B01001_026') {
-      adjustment <- 0
-      for (x in extra_indices) {
-        index <- i + x
-        if (index <= nrow(acs_b01001_data)) {
-          adjustment <- adjustment + acs_b01001_data[index, 'estimate']
-        }
-      }
-      acs_b01001_data[i, 'estimate'] <- acs_b01001_data[i, 'estimate'] - adjustment
-    }
-  }
+  print(extra_indices)
 
   # Define age groups for aggregation
   age_groups <- list(
@@ -101,7 +90,7 @@ process_acs_age_sex_data <- function(brks, labs, statename, countyname) {
 
   # Create a new mapping based on the input labs that are present in the age_groups list
   new_age_groups <- age_groups[names(age_groups) %in% labs]
-  print(new_age_groups)
+
   # Function to aggregate data based on age groups
   aggregate_age_data <- function(data, groups) {
     aggregated_list <- lapply(names(groups), function(group) {
@@ -122,12 +111,12 @@ process_acs_age_sex_data <- function(brks, labs, statename, countyname) {
 
   # Apply the aggregation function
   aggregated_age_data <- aggregate_age_data(acs_b01001_data, new_age_groups)
-  print(aggregated_age_data)
+
   # Pivot the data to make `variable` categories into columns
   pivoted_data <- aggregated_age_data %>%
     select(-moe) %>% # Remove the `moe` column
     pivot_wider(names_from = variable, values_from = estimate)
-  print(pivoted_data)
+
   # Find row sums and identify rows where sums are 0
   row_sums <- rowSums(pivoted_data[,-c(1,2)])
   zero_row_indices <- which(row_sums == 0)
@@ -135,25 +124,24 @@ process_acs_age_sex_data <- function(brks, labs, statename, countyname) {
   # Remove rows where the row sums are 0 and add Haldane-Anscombe correction
   con_age <- pivoted_data[-zero_row_indices, -c(1,2,3,4)] + 0.5
   con_sex <- pivoted_data[-zero_row_indices, c(3,4)] + 0.5
-  write.csv(con_age,'con_age.csv')
-  write.csv(con_sex,'con_sex.csv')
-  # print(data.frame(con_age))
-  # print(data.frame(con_sex))
+
   # Return results as a list
-  return(data.frame(con_age = con_age, con_sex = con_sex))
+  return(list(
+    con_age = con_age,
+    con_sex = con_sex
+  ))
 }
 
 # Example usage of the function
-# brks <- c(25, 30, 35, 40, 45, 50, 55, 60, 62, 65, 67, 70, 75, 80, 85, Inf)
-# labs <- c(
-#   "25 to 29 years", "30 to 34 years", "35 to 39 years", "40 to 44 years", "45 to 49 years",
-#   "50 to 54 years", "55 to 59 years", "60 and 61 years", "62 to 64 years", "65 and 66 years",
-#   "67 to 69 years", "70 to 74 years", "75 to 79 years", "80 to 84 years", "85 years and over"
-# )
-# statename <- "NJ"
-# countyname <- "Middlesex"
+brks <- c(25, 30, 35, 40, 45, 50, 55, 60, 62, 65, 67, 70, 75, 80, 85, Inf)
+labs <- c(
+  "25 to 29 years", "30 to 34 years", "35 to 39 years", "40 to 44 years", "45 to 49 years",
+  "50 to 54 years", "55 to 59 years", "60 and 61 years", "62 to 64 years", "65 and 66 years",
+  "67 to 69 years", "70 to 74 years", "75 to 79 years", "80 to 84 years", "85 years and over"
+)
+statename <- "NJ"
+countyname <- "Middlesex"
 
-# results <- process_acs_age_sex_data(brks, labs, statename, countyname)
-# # print(results)
-# con_age <- results$con_age
-# con_sex <- results$con_sex
+results <- process_acs_age_sex_data(brks, labs, statename, countyname)
+con_age <- results$con_age
+con_sex <- results$con_sex
