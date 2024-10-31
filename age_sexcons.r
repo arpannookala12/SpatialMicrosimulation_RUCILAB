@@ -100,7 +100,7 @@ process_acs_age_sex_data <- function(brks, labs, statename, countyname) {
   )
 
   # Create a new mapping based on the input labs that are present in the age_groups list
-  new_age_groups <- age_groups[names(age_groups) %in% labs]
+  new_age_groups <- age_groups[names(age_groups) %in% labs | names(age_groups) %in% c("Male", "Female")]
   print(new_age_groups)
   # Function to aggregate data based on age groups
   aggregate_age_data <- function(data, groups) {
@@ -145,16 +145,16 @@ process_acs_age_sex_data <- function(brks, labs, statename, countyname) {
 }
 
 # Example usage of the function
-# brks <- c(25, 30, 35, 40, 45, 50, 55, 60, 62, 65, 67, 70, 75, 80, 85, Inf)
-# labs <- c(
-#   "25 to 29 years", "30 to 34 years", "35 to 39 years", "40 to 44 years", "45 to 49 years",
-#   "50 to 54 years", "55 to 59 years", "60 and 61 years", "62 to 64 years", "65 and 66 years",
-#   "67 to 69 years", "70 to 74 years", "75 to 79 years", "80 to 84 years", "85 years and over"
-# )
-# statename <- "NJ"
-# countyname <- "Middlesex"
+brks <- c(25, 30, 35, 40, 45, 50, 55, 60, 62, 65, 67, 70, 75, 80, 85)
+labs <- c(
+  "25 to 29 years", "30 to 34 years", "35 to 39 years", "40 to 44 years", "45 to 49 years",
+  "50 to 54 years", "55 to 59 years", "60 and 61 years", "62 to 64 years", "65 and 66 years",
+  "67 to 69 years", "70 to 74 years", "75 to 79 years", "80 to 84 years"
+)
+statename <- "NJ"
+countyname <- "Middlesex"
 
-# results <- process_acs_age_sex_data(brks, labs, statename, countyname)
-# # print(results)
+process_acs_age_sex_data(brks, labs, statename, countyname)
+# print(results)
 # con_age <- results$con_age
 # con_sex <- results$con_sex

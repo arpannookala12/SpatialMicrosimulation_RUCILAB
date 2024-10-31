@@ -41,7 +41,7 @@ acs_B15003_data
 acs_B15003_data
 edu_groups <- list(
   "Less than high school" = c("B15003_002","B15003_003","B15003_004","B15003_005","B15003_006","B15003_007","B15003_008","B15003_009","B15003_010","B15003_011","B15003_012"),
-  "Some high school" = c("B15003_013", "B15003_014", "B15003_015","B15003_016"),
+  # "Some high school" = c("B15003_013", "B15003_014", "B15003_015","B15003_016"),
   "High school graduate or equivalent (for example GED)" = c("B15003_017", "B15003_018"),
   "Some college, but degree not received or is in progress" = c("B15003_019", "B15003_020"),
   "Associate’s degree (for example AA, AS)" = "B15003_021",
