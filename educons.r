@@ -18,7 +18,7 @@ acs_B15003_data <- get_acs(
   geography = "block group",
   variables = B15003_vars,
   state = "NJ",
-  county = "Middlesex",
+  county = "Middles",
   year = 2022,
   survey = "acs5"
 )

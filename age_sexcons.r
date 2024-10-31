@@ -140,7 +140,8 @@ process_acs_age_sex_data <- function(brks, labs, statename, countyname) {
   # print(data.frame(con_age))
   # print(data.frame(con_sex))
   # Return results as a list
-  return(data.frame(con_age = con_age, con_sex = con_sex))
+  # return(data.frame(con_age = con_age, con_sex = con_sex))
+  return()
 }
 
 # Example usage of the function
