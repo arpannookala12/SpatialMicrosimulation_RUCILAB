@@ -122,39 +122,61 @@ process_acs_age_sex_data <- function(brks, labs, statename, countyname) {
 
   # Apply the aggregation function
   aggregated_age_data <- aggregate_age_data(acs_b01001_data, new_age_groups)
-  print(aggregated_age_data)
+  # print(aggregated_age_data)
   # Pivot the data to make `variable` categories into columns
   pivoted_data <- aggregated_age_data %>%
     select(-moe) %>% # Remove the `moe` column
     pivot_wider(names_from = variable, values_from = estimate)
-  print(pivoted_data)
+  # print(pivoted_data)
   # Find row sums and identify rows where sums are 0
   row_sums <- rowSums(pivoted_data[,-c(1,2)])
   zero_row_indices <- which(row_sums == 0)
-
+  print(zero_row_indices)
+  print(length(zero_row_indices))
   # Remove rows where the row sums are 0 and add Haldane-Anscombe correction
-  con_age <- pivoted_data[-zero_row_indices, -c(1,2,3,4)] + 0.5
-  con_sex <- pivoted_data[-zero_row_indices, c(3,4)] + 0.5
-  write.csv(con_age,'con_age.csv')
-  write.csv(con_sex,'con_sex.csv')
+  # con_age <- pivoted_data[-zero_row_indices, -c(2,3,4)] + 0.5
+  # con_sex <- pivoted_data[-zero_row_indices, c(1,3,4)] + 0.5
+  # Add 0.5 only to numeric columns for 'con_age'
+  con_age <- pivoted_data[-zero_row_indices, -c(2,3,4)]
+  con_age[] <- lapply(con_age, function(column) {
+  if (is.numeric(column)) {
+  return(column + 0.5)
+  } else {
+  return(column)
+  }
+  })
+
+  # Add 0.5 only to numeric columns for 'con_sex'
+  con_sex <- pivoted_data[-zero_row_indices, c(1,3,4)]
+  con_sex[] <- lapply(con_sex, function(column) {
+  if (is.numeric(column)) {
+  return(column + 0.5)
+  } else {
+  return(column)
+  }
+  })
+  print(con_age)
+  print(con_sex)
+  # write.csv(con_age,'con_age.csv')
+  # write.csv(con_sex,'con_sex.csv')
   # print(data.frame(con_age))
   # print(data.frame(con_sex))
   # Return results as a list
-  # return(data.frame(con_age = con_age, con_sex = con_sex))
-  return()
+  # Return results separately
+  return(list(con_age = con_age, con_sex = con_sex, zero_row_indices=zero_row_indices))
 }
 
-# Example usage of the function
-brks <- c(25, 30, 35, 40, 45, 50, 55, 60, 62, 65, 67, 70, 75, 80, 85)
-labs <- c(
-  "25 to 29 years", "30 to 34 years", "35 to 39 years", "40 to 44 years", "45 to 49 years",
-  "50 to 54 years", "55 to 59 years", "60 and 61 years", "62 to 64 years", "65 and 66 years",
-  "67 to 69 years", "70 to 74 years", "75 to 79 years", "80 to 84 years"
-)
-statename <- "NJ"
-countyname <- "Middlesex"
+# # Example usage of the function
+# brks <- c(25, 30, 35, 40, 45, 50, 55, 60, 62, 65, 67, 70, 75, 80, 85)
+# labs <- c(
+#   "25 to 29 years", "30 to 34 years", "35 to 39 years", "40 to 44 years", "45 to 49 years",
+#   "50 to 54 years", "55 to 59 years", "60 and 61 years", "62 to 64 years", "65 and 66 years",
+#   "67 to 69 years", "70 to 74 years", "75 to 79 years", "80 to 84 years"
+# )
+# statename <- "NJ"
+# countyname <- "Middlesex"
 
-process_acs_age_sex_data(brks, labs, statename, countyname)
-# print(results)
-# con_age <- results$con_age
-# con_sex <- results$con_sex
+# process_acs_age_sex_data(brks, labs, statename, countyname)
+# # print(results)
+# # con_age <- results$con_age
+# # con_sex <- results$con_sex
